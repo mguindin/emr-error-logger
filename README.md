@@ -1,4 +1,17 @@
-# emr-error-logger
+# EMR Error Log Downloader
+
+This is a simple binary that writes out the error log (stored in S3) from a failed EMR cluster
+
+## Installation
+First install `vgo`:
+```sh
+  go get -u golang.org/x/vgo
+```
+
+Then install:
+```sh
+  vgo install
+```
 
 Usage:
 ```sh
@@ -9,9 +22,6 @@ Usage of emr-error-logger:
         cluster ID
 ```
 
-This is a simple binary that writes out the error log (stored in S3) from a failed EMR cluster
-
-TODO:
+## TODO:
 1. Handle bootstrap errors
 1. Write tests
-
