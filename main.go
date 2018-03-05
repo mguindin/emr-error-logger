@@ -64,6 +64,7 @@ func s3FileToLocal(s3Client *s3.S3, objInput *s3.GetObjectInput) {
 			log.Fatalf("Error writing out file: %s", err.Error())
 		}
 	}
+	log.Print("Wrote log to `error-log.log`")
 }
 
 func getCluster(client *emr.EMR, clusterID *string) *emr.DescribeClusterOutput {
