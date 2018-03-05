@@ -30,6 +30,8 @@ func main() {
 		errorLog := getFailedStepErrorLog(emrClient, clusterID)
 		if errorLog != "" {
 			s3FileToLocal(s3Client, createS3GetObject(errorLog))
+		} else {
+			log.Printf("Blank error log")
 		}
 	}
 }
@@ -87,19 +89,26 @@ func getFailedStepErrorLog(client *emr.EMR, clusterID *string) string {
 	listStepsInput := &emr.ListStepsInput{
 		ClusterId: clusterID,
 	}
-	out, err := client.ListSteps(listStepsInput)
+
+	pageNum := 0
+	var logFile string
+	err := client.ListStepsPages(listStepsInput,
+		func(page *emr.ListStepsOutput, lastPage bool) bool {
+			for _, step := range page.Steps {
+				if *step.Status.State == "FAILED" {
+					log.Printf("Step %v failed\n", *step.Id)
+					log.Printf("failure log %s", *step.Status.FailureDetails.LogFile)
+					logFile = *step.Status.FailureDetails.LogFile
+				}
+			}
+			pageNum++
+			return !lastPage
+		})
 	if err != nil {
 		log.Fatal("Unable to fetch list of steps")
 	}
 
-	for _, step := range out.Steps {
-		if *step.Status.State == "FAILED" {
-			log.Printf("Step %v failed\n", *step.Id)
-			log.Printf("failure log %s", *step.Status.FailureDetails.LogFile)
-			return *step.Status.FailureDetails.LogFile
-		}
-	}
-	return ""
+	return logFile
 }
 
 func createS3GetObject(logFile string) *s3.GetObjectInput {
