@@ -2,6 +2,10 @@
 
 This is a simple binary that writes out the error log (stored in S3) from a failed EMR cluster
 
+## Prereqs
+You need to have AWS credentials stored in a proper place (e.g.
+`~/.aws/credentials`)
+
 ## Installation
 First install `vgo`:
 ```sh
