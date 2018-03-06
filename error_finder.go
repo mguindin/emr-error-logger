@@ -79,7 +79,10 @@ func (e *EMRErrorFinder) GetBootstrapFailureErrorLog(step int) string {
 		func(page *emr.ListBootstrapActionsOutput, lastPage bool) bool {
 			for _, action := range page.BootstrapActions {
 				if stepNo == step {
-					log.Printf("failed action: %s", *action.Name)
+					log.Printf("failed action: %s, args:", *action.Name)
+					for _, arg := range action.Args {
+						log.Print(*arg)
+					}
 					break
 				}
 				stepNo++
