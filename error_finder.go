@@ -128,6 +128,9 @@ func (e *EMRErrorFinder) S3FileToLocal(objInput *s3.GetObjectInput) string {
 }
 
 func CreateS3GetObject(logFile string) *s3.GetObjectInput {
+	if logFile == "" {
+		return nil
+	}
 	s3LessLog := strings.Replace(logFile, "s3://", "", 1)
 	splits := strings.SplitN(s3LessLog, "/", 2)
 	bucket := splits[0]
