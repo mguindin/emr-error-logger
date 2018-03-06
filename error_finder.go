@@ -49,7 +49,6 @@ func (e *EMRErrorFinder) GetFailedStepErrorLog() string {
 		ClusterId: clusterID,
 	}
 
-	pageNum := 0
 	var logFile string
 	err := e.EmrClient.ListStepsPages(listStepsInput,
 		func(page *emr.ListStepsOutput, lastPage bool) bool {
@@ -60,11 +59,35 @@ func (e *EMRErrorFinder) GetFailedStepErrorLog() string {
 					logFile = *step.Status.FailureDetails.LogFile
 				}
 			}
-			pageNum++
 			return !lastPage
 		})
 	if err != nil {
 		log.Fatal("Unable to fetch list of steps")
+	}
+
+	return logFile
+}
+
+func (e *EMRErrorFinder) GetBootstrapFailureErrorLog(step int) string {
+	bootstrapActionsInput := &emr.ListBootstrapActionsInput{
+		ClusterId: clusterID,
+	}
+
+	var stepNo int
+	var logFile string
+	err := e.EmrClient.ListBootstrapActionsPages(bootstrapActionsInput,
+		func(page *emr.ListBootstrapActionsOutput, lastPage bool) bool {
+			for _, action := range page.BootstrapActions {
+				if stepNo == step {
+					log.Printf("failed action: %s", *action.Name)
+					break
+				}
+				stepNo++
+			}
+			return !lastPage
+		})
+	if err != nil {
+		log.Fatal("Unable to fetch bootstrap actions")
 	}
 
 	return logFile
