@@ -70,12 +70,13 @@ func (e *EMRErrorFinder) GetFailedStepErrorLog() string {
 	return logFile
 }
 
-func (e *EMRErrorFinder) S3FileToLocal(objInput *s3.GetObjectInput) {
+func (e *EMRErrorFinder) S3FileToLocal(objInput *s3.GetObjectInput) string {
 	obj, err := e.S3Client.GetObject(objInput)
 	if err != nil {
 		log.Fatalf("Unable to fetch error log %s", err.Error())
 	}
-	fo, err := os.Create("error-log.log")
+	errorFile := "error.log"
+	fo, err := os.Create(errorFile)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -100,7 +101,7 @@ func (e *EMRErrorFinder) S3FileToLocal(objInput *s3.GetObjectInput) {
 			log.Fatalf("Error writing out file: %s", err.Error())
 		}
 	}
-	log.Print("Wrote log to `error-log.log`")
+	return errorFile
 }
 
 func CreateS3GetObject(logFile string) *s3.GetObjectInput {
